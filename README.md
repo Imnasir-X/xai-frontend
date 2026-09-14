@@ -7,6 +7,21 @@ Stripe / Linear / Vercel bar than a generic "AI dark mode" template.
 
 Live sections: **Hero → Insight Flow → Workspace → Intelligence Engine → Footer.**
 
+## Demo video & screenshots
+
+**[▶ Watch the narrated demo video](./docs/xai-frontend-demo-narrated.mp4)** (1 min 51 s, 1080p, English narration)
+
+The video walks through the hero data-lattice (live WebGL, cursor-driven vortex), the scroll-driven insight flow, the workspace dashboard preview, the intelligence-engine signature interaction, and the footer — with the real production build rendering at 1080p. Every frame was captured from the actual running app.
+
+| | |
+|---|---|
+| ![Hero data lattice](./docs/xai-01-hero.png) | ![Cursor vortex interaction](./docs/xai-02-hero-vortex.png) |
+| **Hero — WebGL data lattice** | **Cursor-driven vortex interaction** |
+| ![Insight flow](./docs/xai-03-insight.png) | ![Intelligence engine](./docs/xai-05-signature.png) |
+| **Insight Flow (scroll-driven)** | **Intelligence Engine — signature interaction** |
+| ![Dashboard preview](./docs/xai-04-dashboard.png) | ![Footer](./docs/xai-06-footer.png) |
+| **Workspace — dashboard preview** | **Footer** |
+
 ---
 
 ## Stack
