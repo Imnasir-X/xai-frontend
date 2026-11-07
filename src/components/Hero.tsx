@@ -1,6 +1,6 @@
 "use client";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useRef, Suspense, useMemo, useState, useEffect } from "react";
+import { useRef, Suspense, useMemo, useState, useEffect, useSyncExternalStore } from "react";
 import * as THREE from "three";
 import { motion } from "framer-motion";
 
@@ -8,16 +8,20 @@ const GRID_SIZE = 5;
 const SPACING = 1.0;
 const TOTAL_POINTS = GRID_SIZE * GRID_SIZE * GRID_SIZE;
 
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+function subscribeReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
+  mq.addEventListener?.("change", onChange);
+  return () => mq.removeEventListener?.("change", onChange);
+}
+
 function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, []);
-  return reduced;
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+    () => false
+  );
 }
 
 function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
@@ -132,9 +136,9 @@ function DataLattice({ reducedMotion }: { reducedMotion: boolean }) {
     for (let i = 0; i < TOTAL_POINTS; i++) {
       const i3 = i * 3;
 
-      let targetX = THREE.MathUtils.lerp(vortexPositions[i3], gridPositions[i3], form) + Math.sin(t * 0.5 + i) * breathe;
-      let targetY = THREE.MathUtils.lerp(vortexPositions[i3 + 1], gridPositions[i3 + 1], form) + Math.cos(t * 0.5 + i) * breathe;
-      let targetZ = THREE.MathUtils.lerp(vortexPositions[i3 + 2], gridPositions[i3 + 2], form);
+      const targetX = THREE.MathUtils.lerp(vortexPositions[i3], gridPositions[i3], form) + Math.sin(t * 0.5 + i) * breathe;
+      const targetY = THREE.MathUtils.lerp(vortexPositions[i3 + 1], gridPositions[i3 + 1], form) + Math.cos(t * 0.5 + i) * breathe;
+      const targetZ = THREE.MathUtils.lerp(vortexPositions[i3 + 2], gridPositions[i3 + 2], form);
 
       velocities[i3] += (targetX - currentPositions[i3]) * stiffness;
       velocities[i3 + 1] += (targetY - currentPositions[i3 + 1]) * stiffness;
@@ -197,23 +201,27 @@ function DataLattice({ reducedMotion }: { reducedMotion: boolean }) {
     }
   });
 
+  // Stable buffers for the geometry attributes; useFrame mutates them in place.
+  const initialPointPositions = useMemo(() => gridPositions.slice(), [gridPositions]);
+  const linePositions = useMemo(() => new Float32Array(lineIndices.length * 3), [lineIndices]);
+
   return (
     <group ref={groupRef}>
       <points ref={pointsRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={gridPositions.length / 3} array={gridPositions.slice()} itemSize={3} />
+          <bufferAttribute attach="attributes-position" args={[initialPointPositions, 3]} />
         </bufferGeometry>
         <pointsMaterial size={0.05} color="#FFFFFF" transparent opacity={0.8} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
       </points>
       <lineSegments ref={linesRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={lineIndices.length} array={new Float32Array(lineIndices.length * 3)} itemSize={3} />
+          <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
         </bufferGeometry>
         <lineBasicMaterial color="#4F46E5" transparent opacity={0.2} blending={THREE.AdditiveBlending} />
       </lineSegments>
       <points ref={pulsesRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={pulsePositions.length / 3} array={pulsePositions} itemSize={3} />
+          <bufferAttribute attach="attributes-position" args={[pulsePositions, 3]} />
         </bufferGeometry>
         <pointsMaterial size={0.12} color="#818CF8" transparent opacity={1} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
       </points>
