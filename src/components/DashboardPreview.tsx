@@ -9,7 +9,7 @@ const usesReducedMotion = () =>
 function CountUp({ end, duration = 1.1, decimals = 0, suffix = "" }: { end: number; duration?: number; decimals?: number; suffix?: string; }) {
   const [display, setDisplay] = useState(0);
   const fromRef = useRef(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const from = fromRef.current;
@@ -58,7 +58,6 @@ export default function DashboardPreview() {
     { sender: "ai", text: "Workspace initialized. Ask me to analyze retention, revenue, or latency." }
   ]);
   const [isThinking, setIsThinking] = useState(false);
-  const [isCodeRunning, setIsCodeRunning] = useState(false); // New state for code panel reaction
   const [activeTab, setActiveTab] = useState("Overview");
   const [highlightMetric, setHighlightMetric] = useState<string | null>(null);
   const [activityFeed, setActivityFeed] = useState([
@@ -149,16 +148,12 @@ export default function DashboardPreview() {
     setMessages(prev => [...prev, { sender: "user", text: query }]);
     setInput("");
     setIsThinking(true);
-    setIsCodeRunning(true); // Trigger code panel highlight
 
     setActiveTab("Overview");
     const q = query.toLowerCase();
     if (q.includes("latency")) setHighlightMetric("latency");
     else if (q.includes("retention") || q.includes("accuracy")) setHighlightMetric("accuracy");
     else setHighlightMetric("throughput");
-
-    // Stop code highlight after 800ms
-    setTimeout(() => setIsCodeRunning(false), 800);
 
     setTimeout(() => {
       const responseText = getMockResponse(query);

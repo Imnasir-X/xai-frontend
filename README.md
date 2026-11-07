@@ -1,135 +1,142 @@
-# Xai — Intelligence Workspace
+# Xai: Intelligence Workspace
 
-A design-forward marketing surface for an AI intelligence product: a WebGL data
-lattice hero, a scroll-driven "insight flow", a live product dashboard preview,
-and a custom-shader signature interaction. Built to feel closer to the
-Stripe / Linear / Vercel bar than a generic "AI dark mode" template.
+[![CI](https://github.com/Imnasir-X/xai-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/Imnasir-X/xai-frontend/actions/workflows/ci.yml)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Live sections: **Hero → Insight Flow → Workspace → Intelligence Engine → Footer.**
+A design-focused marketing site for a concept AI intelligence product, built with Next.js, three.js, GSAP and Framer Motion: a WebGL data-lattice hero, a scroll-driven insight flow, a live dashboard preview and a custom-shader signature interaction.
 
-## Demo video & screenshots
+![Hero: WebGL data lattice](./docs/xai-01-hero.png)
 
-**[▶ Watch the narrated demo video](./docs/xai-frontend-demo-narrated.mp4)** (1 min 51 s, 1080p, English narration)
+**[Watch the narrated demo video](./docs/xai-frontend-demo-narrated.mp4)** (1 min 51 s, 1080p, English narration), captured from the running production build.
 
-The video walks through the hero data-lattice (live WebGL, cursor-driven vortex), the scroll-driven insight flow, the workspace dashboard preview, the intelligence-engine signature interaction, and the footer — with the real production build rendering at 1080p. Every frame was captured from the actual running app.
+## Features
+
+- **Hero data lattice**: a 5x5x5 point grid rendered with `@react-three/fiber` that forms out of a vortex into a clean lattice, with a cursor-driven repulsion field and travelling pulses along the connecting lines.
+- **Insight Flow**: a GSAP ScrollTrigger section that pins and converts vertical scroll into horizontal travel across three stages.
+- **Workspace dashboard preview**: a mock product UI with a streamed answer to typed or suggested questions, a live activity feed and count-up metrics. All content is simulated in the browser; there is no backend.
+- **Intelligence Engine**: an icosahedron displaced by 3D simplex noise in a custom GLSL vertex shader, with recalculated normals and a Fresnel rim, reacting to the pointer.
+- **Reduced-motion support**: the lattice forms instantly, the shader stops animating and the horizontal scroll and auto-demo are skipped when the OS requests reduced motion.
+- Statically prerendered; deployable to any Next.js host.
+
+## Screenshots
 
 | | |
 |---|---|
-| ![Hero data lattice](./docs/xai-01-hero.png) | ![Cursor vortex interaction](./docs/xai-02-hero-vortex.png) |
-| **Hero — WebGL data lattice** | **Cursor-driven vortex interaction** |
-| ![Insight flow](./docs/xai-03-insight.png) | ![Intelligence engine](./docs/xai-05-signature.png) |
-| **Insight Flow (scroll-driven)** | **Intelligence Engine — signature interaction** |
-| ![Dashboard preview](./docs/xai-04-dashboard.png) | ![Footer](./docs/xai-06-footer.png) |
-| **Workspace — dashboard preview** | **Footer** |
+| ![Cursor vortex interaction](./docs/xai-02-hero-vortex.png) | ![Insight flow](./docs/xai-03-insight.png) |
+| **Cursor-driven vortex interaction** | **Insight Flow (scroll-driven)** |
+| ![Dashboard preview](./docs/xai-04-dashboard.png) | ![Intelligence engine](./docs/xai-05-signature.png) |
+| **Workspace: dashboard preview** | **Intelligence Engine: signature interaction** |
 
----
+## Tech stack
 
-## Stack
+| Concern       | Choice                                   |
+| ------------- | ---------------------------------------- |
+| Framework     | Next.js 16 (App Router), React 19        |
+| Language      | TypeScript (strict)                      |
+| Styling       | Tailwind CSS 3, CSS custom-property tokens |
+| 3D / GPU      | three.js + `@react-three/fiber` 9, custom GLSL |
+| Scroll motion | GSAP + ScrollTrigger                     |
+| UI motion     | Framer Motion                            |
+| Fonts         | Inter, Bricolage Grotesque, JetBrains Mono via `next/font` |
 
-| Concern            | Choice |
-| ------------------ | ------ |
-| Framework          | Next.js 14 (App Router) |
-| Language           | TypeScript (strict) |
-| Styling            | Tailwind CSS 3 (token-driven) |
-| 3D / GPU           | three.js + `@react-three/fiber` |
-| Scroll motion      | GSAP + ScrollTrigger |
-| UI motion          | Framer Motion |
+## Quick start
 
-## Getting started
+Requires Node.js 20.9 or newer.
 
 ```bash
-npm install
-npm run dev      # http://localhost:3000
+git clone https://github.com/Imnasir-X/xai-frontend.git
+cd xai-frontend
+npm ci
+npm run dev        # http://localhost:3000
 ```
 
-Other scripts: `npm run build` (production build), `npm run start` (serve the
-build), `npm run lint`.
+| Script              | What it does                     |
+| ------------------- | -------------------------------- |
+| `npm run dev`       | Development server               |
+| `npm run build`     | Production build (static export of `/`) |
+| `npm run start`     | Serve the production build       |
+| `npm run lint`      | ESLint (Next.js core-web-vitals + TypeScript rules) |
+| `npm run typecheck` | `tsc --noEmit`                   |
 
-> **Note:** Node 18+ is required. If you're viewing this running on a remote
-> machine, `localhost:3000` refers to *that* machine — run the steps above
-> locally to open it in your own browser.
+## Usage
 
----
+Scroll through the page top to bottom. Move the pointer over the hero to push the lattice around and over the Intelligence Engine to change its displacement. In the Workspace section, type a question (for example "Why did retention drop last month?") or click a suggested prompt to see a simulated streamed answer.
 
-## Architecture
+## Project structure
 
 ```text
-xai-workspace/
+xai-frontend/
 ├── src/
 │   ├── app/
-│   │   ├── globals.css       # Design tokens, type scale, custom utilities (.grid-bg)
-│   │   ├── layout.tsx        # Root layout, Inter font, <html> theming
-│   │   └── page.tsx          # Section composition
+│   │   ├── globals.css             # Design tokens, type scale, keyframes, utilities
+│   │   ├── layout.tsx              # Root layout and next/font setup
+│   │   └── page.tsx                # Section composition
 │   ├── components/
-│   │   ├── Navbar.tsx              # Blurred fixed nav
-│   │   ├── Hero.tsx               # three.js 3D data lattice with depth falloff
-│   │   ├── InsightFlow.tsx        # GSAP horizontal pinned scroll, geometric cards
-│   │   ├── DashboardPreview.tsx   # Live product UI (streaming AI, activity feed, counters)
-│   │   ├── SignatureInteraction.tsx # Custom GLSL: normal recalculation + Fresnel
-│   │   └── Footer.tsx            # Minimalist footer
-│   └── tailwind.config.ts    # Design-system source of truth
-├── tailwind.config.ts        # Re-exports src/tailwind.config.ts (Tailwind entry)
-├── postcss.config.mjs
+│   │   ├── Navbar.tsx              # Fixed, blurred navigation
+│   │   ├── Hero.tsx                # three.js data lattice and HUD
+│   │   ├── InsightFlow.tsx         # GSAP pinned horizontal scroll
+│   │   ├── DashboardPreview.tsx    # Simulated live product UI
+│   │   ├── SignatureInteraction.tsx # Custom GLSL displacement + Fresnel
+│   │   └── Footer.tsx
+│   └── tailwind.config.ts          # Design-system source of truth
+├── tailwind.config.ts              # Re-exports src/tailwind.config.ts
+├── docs/                           # Screenshots and demo video
+├── eslint.config.mjs
 ├── next.config.mjs
-└── tsconfig.json             # `@/*` path alias → ./src/*
+├── postcss.config.mjs
+└── tsconfig.json                   # `@/*` path alias to ./src/*
 ```
 
-The design system is single-sourced: colors, type scale and easing live in
-`src/tailwind.config.ts` and `globals.css`, and every component consumes those
-tokens (`bg-background`, `text-secondary`, `tracking-tightest`, etc.) rather
-than hard-coded values.
-
----
+Colors, fonts and easing live in `src/tailwind.config.ts` and `globals.css`; components use those tokens (`bg-background`, `text-secondary`, `font-display`, `bg-live`) rather than hard-coded values.
 
 ## Animation decisions
 
-Each interaction is chosen to *communicate the product* (raw data → structured
+Each interaction is chosen to *communicate the product* (raw data to structured
 intelligence), not just to decorate.
 
-### Hero — 3D data lattice (`Hero.tsx`)
-- A 6³ point grid rendered with `@react-three/fiber`. Points start scattered
-  (random offsets) and **lerp into a clean lattice** on a sine loop — a literal
-  "chaos → structure" metaphor.
+### Hero: 3D data lattice (`Hero.tsx`)
+- A 5x5x5 (125-point) grid rendered with `@react-three/fiber`. Points start in
+  a vortex and are pulled into a clean lattice by a damped spring: a literal
+  "chaos to structure" metaphor. Once formed, the lattice breathes slightly.
 - Line segments are rebuilt each frame from the live point positions so the
-  connective mesh breathes with the points.
-- Grid is kept small (6³) and lines use additive blending + low opacity for
-  performance and depth. A **radial gradient overlay** fades the lattice at the
-  edges so it frames the headline instead of competing with it.
-- Subtle parallax: the group eases toward the pointer via `MathUtils.lerp`.
+  connective mesh moves with the points, and a few pulses travel along them.
+- The pointer is projected into the scene and pushes nearby points away.
+- Lines use additive blending at low opacity, and a radial gradient overlay
+  fades the lattice at the edges so it frames the headline.
 
-### Insight Flow — pinned horizontal scroll (`InsightFlow.tsx`)
+### Insight Flow: pinned horizontal scroll (`InsightFlow.tsx`)
 - GSAP `ScrollTrigger` **pins** the section and translates the card track on X,
   converting vertical scroll into horizontal travel. `invalidateOnRefresh`
   keeps the distance correct on resize; triggers are cleaned up on unmount.
-- Each stage has its own **geometric glyph** (scatter→converge, neural grid,
+- Each stage has its own **geometric glyph** (scatter to converge, neural grid,
   target) plus a numbered node threaded by a continuous connector line, giving
   the three steps distinct personality and a sense of progression.
 - Hover lifts the card (`-translate-y`, indigo shadow) and warms the glyph/nodes
   to the accent color.
 
-### Workspace — live dashboard (`DashboardPreview.tsx`)
-- Everything animates **only while in view** (`useInView`) to avoid wasted work.
-- **Streaming AI answer**: the response types out character-by-character with a
-  blinking caret, then loops — functional "live" feeling, not a static mock.
-- **Live activity feed**: new timestamped events prepend on an interval with
-  Framer Motion `layout` + `AnimatePresence` enter/exit transitions.
+### Workspace: live dashboard (`DashboardPreview.tsx`)
+- When the section scrolls into view (`IntersectionObserver`), an auto-demo
+  types a suggested question and runs it, unless the visitor has already
+  interacted.
+- **Streaming answer**: the canned response types out character by character
+  with a blinking caret, and the related metric is highlighted while it runs.
+- **Live activity feed**: new events prepend with Framer Motion `layout` and
+  `AnimatePresence` enter/exit transitions.
 - **Count-up metrics**: a `requestAnimationFrame` cubic-ease hook animates
-  Accuracy / Latency / Throughput from zero on reveal.
+  the metric values, which then jitter within realistic ranges.
 
-### Intelligence Engine — custom GLSL (`SignatureInteraction.tsx`)
+### Intelligence Engine: custom GLSL (`SignatureInteraction.tsx`)
 - An icosahedron displaced by 3D simplex noise in the **vertex shader**.
 - **Normals are recalculated** from finite differences (sampling the
   displacement at two tangent-offset points) so lighting stays accurate after
-  displacement — no faceting artifacts.
+  displacement: no faceting artifacts.
 - A **Fresnel rim term** in the fragment shader adds a physical, high-end edge
   glow; base color is deep indigo rather than flat black.
 - Displacement intensity and noise offset **track the pointer**, so the core
   visibly reacts to the user.
 
----
+## License
 
-## Notes / roadmap
-
-- Not yet included: Figma source file, walkthrough video, and a live
-  deployment. The code is deployment-ready (`npm run build` passes) and can be
-  shipped to any Next.js host (e.g. Vercel).
+Released under the [MIT License](LICENSE). Copyright (c) 2026 Nasir Khan.
